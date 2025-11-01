@@ -1,11 +1,11 @@
 # def.nvim
 
-SORRY!!!!! the api is currently not working (it keeps timing out [here](https://api.dictionaryapi.dev/api/v2/entries/en/))
-i guess you will have to use other plugins, i don't even know when the api will be back running, RIP def.nvim
-
 def.nvim is a lightweight Neovim plugin for quickly looking up word definitions, examples, synonyms, and antonyms directly in a floating window. It supports word history, favorites, random word exploration, and integrates with Telescope for a smoother experience.
 
 this plugin was made for my neovim config.. so there are probably bigger, better, actively maintained plugins than this.
+
+> [!NOTE]
+> the api has suddenly resumed working
 
 ---
 
