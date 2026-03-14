@@ -4,9 +4,6 @@ def.nvim is a lightweight Neovim plugin for quickly looking up word definitions,
 
 this plugin was made for my neovim config.. so there are probably bigger, better, actively maintained plugins than this.
 
-> [!NOTE]
-> the api has suddenly resumed working
-
 ---
 
 ## Features

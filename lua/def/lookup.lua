@@ -6,7 +6,7 @@ local ui = require("def.ui")(require("def.config"))
 local favs = require("def.favorites")
 local f = require("def.f")
 local fn = f.fn
-local vapi = vapi
+local vapi = vim.api
 
 ---Show a word definition window
 ---@param word string
