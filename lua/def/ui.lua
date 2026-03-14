@@ -148,7 +148,7 @@ function M.create_float(lines, highlights, title, word, fav_mark, enter)
 
   local ns = vim.api.nvim_create_namespace("def_lookup")
   for _, hl in ipairs(highlights) do
-    local line, s, e, group = table.unpack(hl)
+    local line, s, e, group = unpack(hl)
     local _opts = { end_col = e, hl_group = group }
     vim.api.nvim_buf_set_extmark(buf, ns, line, s, _opts)
   end
