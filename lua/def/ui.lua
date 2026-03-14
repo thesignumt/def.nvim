@@ -1,5 +1,6 @@
 local M = {}
 local config
+local ns = vim.api.nvim_create_namespace("def_lookup")
 
 ---Get the maximum UTF-8 line length
 ---@param lines string[]
@@ -7,7 +8,7 @@ local config
 function M.get_max_line_length(lines)
   local max_len = 0
   for _, line in ipairs(lines) do
-    local len = vim.str_utfindex(line, "utf-8")
+    local len = vim.fn.strdisplaywidth(line)
     if len > max_len then
       max_len = len
     end
@@ -21,7 +22,6 @@ end
 ---@return table[] highlights
 function M.build_definition_lines(def_table)
   local lines, highlights = {}, {}
-  local ns = vim.api.nvim_create_namespace("def_lookup")
 
   if def_table[1].ipa then
     table.insert(lines, "Pronunciation: " .. def_table[1].ipa)
@@ -44,7 +44,7 @@ function M.build_definition_lines(def_table)
         table.insert(highlights, { #lines - 1, 12, #lines[#lines], "String" })
       end
 
-      if defi.synonyms and #defi.synonyms > 0 then
+      if defi.synonyms and not vim.tbl_isempty(defi.synonyms) then
         table.insert(
           lines,
           "    Synonyms: " .. table.concat(defi.synonyms, ", ")
@@ -115,8 +115,8 @@ function M.show_remap_help()
     relative = "editor",
     width = width,
     height = height,
-    col = (vim.o.columns - width) / 2,
-    row = (vim.o.lines - height) / 2,
+    col = math.floor((vim.o.columns - width) / 2),
+    row = math.floor((vim.o.lines - height) / 2),
     style = "minimal",
     border = "rounded",
     title = "[ Help ]",
@@ -148,7 +148,7 @@ function M.create_float(lines, highlights, title, word, fav_mark, enter)
 
   local ns = vim.api.nvim_create_namespace("def_lookup")
   for _, hl in ipairs(highlights) do
-    local line, s, e, group = unpack(hl)
+    local line, s, e, group = table.unpack(hl)
     local _opts = { end_col = e, hl_group = group }
     vim.api.nvim_buf_set_extmark(buf, ns, line, s, _opts)
   end
@@ -165,8 +165,8 @@ function M.create_float(lines, highlights, title, word, fav_mark, enter)
     relative = "editor",
     width = width,
     height = height,
-    col = (vim.o.columns - width) / 2,
-    row = (vim.o.lines - height) / 2,
+    col = math.floor((vim.o.columns - width) / 2),
+    row = math.floor((vim.o.lines - height) / 2),
     style = "minimal",
     border = "rounded",
     title = win_title,
