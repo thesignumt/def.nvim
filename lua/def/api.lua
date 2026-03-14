@@ -66,8 +66,7 @@ function M.wotd()
   vim.system({
     "curl",
     "-s",
-    "https://random-word-api.vercel.app/api?words=1&length="
-      .. math.random(3, 9),
+    "https://random-word-api.herokuapp.com/word",
   }, { text = true }, function(obj)
     vim.schedule(function()
       local ok, words = pcall(vim.fn.json_decode, obj.stdout)
@@ -79,7 +78,6 @@ function M.wotd()
       end
     end)
   end)
-
   return out
 end
 
