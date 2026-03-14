@@ -45,7 +45,11 @@ function M.lookup(action)
     lookup = function()
       vim.ui.input({ prompt = "Word to look up: " }, lookup.show_word)
     end,
-    wotd = fn(lookup.show_word, api.wotd()),
+    wotd = fn(api.wotd, function(word)
+      if word then
+        lookup.show_word(word)
+      end
+    end),
     history = fn(hh.telescope_picker, lookup.show_word),
     favorites = fn(favs.telescope_picker, lookup.show_word),
   }

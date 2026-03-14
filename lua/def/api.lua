@@ -1,4 +1,5 @@
 local M = {}
+local Job = require("plenary.job")
 
 ---Fetch word definition
 ---@param word string
@@ -61,24 +62,30 @@ function M.get_winfo(word, callback)
 end
 
 -- Word of the Day fetcher
-function M.wotd()
-  local out
-  vim.system({
-    "curl",
-    "-s",
-    "https://random-word-api.herokuapp.com/word",
-  }, { text = true }, function(obj)
-    vim.schedule(function()
-      local ok, words = pcall(vim.fn.json_decode, obj.stdout)
-      if ok and type(words) == "table" and words[1] then
-        out = words[1]
-      else
-        vim.notify("Failed to fetch random word", vim.log.levels.WARN)
-        out = nil
-      end
-    end)
-  end)
-  return out
+function M.wotd(cb)
+  Job
+    :new({
+      command = "curl",
+      args = { "-s", "https://random-word-api.herokuapp.com/word" },
+      on_exit = function(j, return_val)
+        vim.schedule(function()
+          if return_val == 0 then
+            local ok, words =
+              pcall(vim.fn.json_decode, table.concat(j:result(), ""))
+            if ok and type(words) == "table" and words[1] then
+              cb(words[1])
+            else
+              vim.notify("Failed to parse random word", vim.log.levels.WARN)
+              cb(nil)
+            end
+          else
+            vim.notify("Failed to fetch random word", vim.log.levels.WARN)
+            cb(nil)
+          end
+        end)
+      end,
+    })
+    :start()
 end
 
 return M
