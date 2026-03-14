@@ -6,7 +6,6 @@ local ui = require("def.ui")(require("def.config"))
 local favs = require("def.favorites")
 local f = require("def.f")
 local fn = f.fn
-local vapi = vim.api
 
 ---Show a word definition window
 ---@param word string
@@ -16,23 +15,23 @@ function M.show_word(word)
   end
 
   -- Show loading
-  local loading_buf = vapi.nvim_create_buf(false, true)
-  vapi.nvim_set_option_value("modifiable", false, { buf = loading_buf })
-  vapi.nvim_set_option_value("bufhidden", false, { buf = loading_buf })
-  vapi.nvim_buf_set_lines(
+  local loading_buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(
     loading_buf,
     0,
     -1,
     false,
     { "Loading definition for: " .. word .. " ..." }
   )
+  vim.api.nvim_set_option_value("modifiable", false, { buf = loading_buf })
+  vim.api.nvim_set_option_value("bufhidden", "wipe", { buf = loading_buf })
 
   local width = math.max(40, #word + 20)
-  local loading_win = vapi.nvim_open_win(loading_buf, true, {
+  local loading_win = vim.api.nvim_open_win(loading_buf, true, {
     relative = "editor",
     height = 3,
     width = width,
-    col = math.floor((vim.o.columns - 40) / 2),
+    col = math.floor((vim.o.columns - width) / 2),
     row = math.floor((vim.o.lines - 3) / 2),
     style = "minimal",
     border = "rounded",
@@ -42,14 +41,12 @@ function M.show_word(word)
   -- Fetch definition asynchronously
   api.get_winfo(word, function(def_table)
     local function close_win(win)
-      if vapi.nvim_win_is_valid(win) then
-        vapi.nvim_win_close(win, true)
+      if vim.api.nvim_win_is_valid(win) then
+        vim.api.nvim_win_close(win, true)
       end
     end
     vim.schedule(function()
-      if vapi.nvim_win_is_valid(loading_win) then
-        vapi.nvim_win_close(loading_win, true)
-      end
+      close_win(loading_win)
 
       if not def_table then
         vim.notify("Definition not found: " .. word, vim.log.levels.ERROR, {
@@ -72,7 +69,7 @@ function M.show_word(word)
         ui.create_float(lines, highlights, "word", word, fav_mark, true)
 
       local opts = {
-        buffer = vapi.nvim_win_get_buf(win),
+        buffer = vim.api.nvim_win_get_buf(win),
         nowait = true,
         noremap = true,
         silent = true,
